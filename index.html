@@ -1,0 +1,775 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Research Assistant — Trustly</title>
+<link href="https://fonts.googleapis.com/css2?family=Google+Sans:ital,wght@0,400;0,500;0,700;1,400&family=Google+Sans+Text:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --sidebar-w: 256px;
+  --topbar-h: 0px;
+  --surface: #ffffff;
+  --sidebar-bg: #f0f4f9;
+  --border: #e3e8ef;
+  --border-light: #f0f3f8;
+  --text-primary: #1f2937;
+  --text-secondary: #444746;
+  --text-muted: #9aa0a6;
+  --blue: #1a73e8;
+  --blue-light: #e8f0fe;
+  --user-bubble: #dde3ea;
+  --green: #1a7a4a;
+  --green-light: #e6f4ea;
+  --green-border: #a8d5b5;
+  --font: "Google Sans Text", "Google Sans", sans-serif;
+  --font-display: "Google Sans", sans-serif;
+}
+
+html, body { height: 100%; font-family: var(--font); background: var(--surface); color: var(--text-primary); overflow: hidden; }
+
+/* ── LAYOUT ──────────────────────────────────────────────── */
+.layout { display: flex; height: 100vh; }
+
+/* ── SIDEBAR ─────────────────────────────────────────────── */
+.sidebar {
+  width: var(--sidebar-w);
+  flex-shrink: 0;
+  background: var(--sidebar-bg);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.sidebar-top {
+  padding: 12px 16px 8px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.sidebar-logo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+}
+.sidebar-logo-text {
+  font-family: var(--font-display);
+  font-size: 20px;
+  font-weight: 400;
+  color: #1f1f1f;
+  letter-spacing: -0.2px;
+}
+.sidebar-icon-btn {
+  width: 40px; height: 40px;
+  border-radius: 50%;
+  border: none;
+  background: transparent;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  color: var(--text-secondary);
+  transition: background 0.15s;
+}
+.sidebar-icon-btn:hover { background: rgba(0,0,0,0.06); }
+
+.sidebar-nav { padding: 4px 8px 8px; }
+.nav-item {
+  display: flex; align-items: center; gap: 14px;
+  padding: 8px 14px;
+  border-radius: 28px;
+  font-size: 14px;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: background 0.12s;
+  font-family: var(--font-display);
+  font-weight: 500;
+}
+.nav-item:hover { background: rgba(0,0,0,0.06); }
+.nav-item.active { background: var(--blue-light); color: #1a73e8; }
+.nav-item svg { flex-shrink: 0; opacity: 0.7; }
+.nav-item.active svg { opacity: 1; }
+
+.sidebar-section-label {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--text-muted);
+  padding: 8px 22px 4px;
+  letter-spacing: 0.04em;
+}
+.recent-list { flex: 1; overflow-y: auto; padding: 0 8px 16px; }
+.recent-list::-webkit-scrollbar { width: 4px; }
+.recent-list::-webkit-scrollbar-thumb { background: #ccc; border-radius: 2px; }
+.recent-item {
+  padding: 6px 14px;
+  font-size: 13.5px;
+  color: var(--text-secondary);
+  cursor: pointer;
+  border-radius: 8px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  transition: background 0.12s;
+}
+.recent-item:hover { background: rgba(0,0,0,0.05); }
+
+.sidebar-footer {
+  padding: 12px 16px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.avatar {
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  background: #d93025;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px; font-weight: 500; color: white;
+  flex-shrink: 0; cursor: pointer; overflow: hidden;
+}
+.avatar img { width: 100%; height: 100%; object-fit: cover; }
+.footer-name { font-size: 13px; color: var(--text-secondary); flex: 1; min-width: 0; }
+.footer-name strong { display: block; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.footer-name span { font-size: 11.5px; color: var(--text-muted); }
+.settings-btn {
+  width: 32px; height: 32px;
+  border: none; background: transparent;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; color: var(--text-muted);
+  transition: background 0.12s;
+}
+.settings-btn:hover { background: rgba(0,0,0,0.06); }
+
+/* ── MAIN ─────────────────────────────────────────────────── */
+.main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  position: relative;
+}
+
+/* gradient bg */
+.main-bg {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse 80% 60% at 50% 30%, #dde9f8 0%, #eaf1fb 35%, #f8faff 70%, #ffffff 100%);
+  z-index: 0;
+}
+
+.messages {
+  flex: 1;
+  overflow-y: auto;
+  position: relative;
+  z-index: 1;
+  scroll-behavior: smooth;
+}
+.messages::-webkit-scrollbar { width: 6px; }
+.messages::-webkit-scrollbar-thumb { background: #ccc; border-radius: 3px; }
+
+/* ── WELCOME ─────────────────────────────────────────────── */
+.welcome {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: calc(100vh - 100px);
+  padding: 0 24px 80px;
+  gap: 0;
+}
+.welcome-title {
+  font-family: var(--font-display);
+  font-size: 34px;
+  font-weight: 400;
+  color: #1f2937;
+  letter-spacing: -0.5px;
+  margin-bottom: 32px;
+  text-align: center;
+}
+.welcome-title .colored { 
+  background: linear-gradient(90deg, #4285f4, #9b72cb, #d96570);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ── CHAT ────────────────────────────────────────────────── */
+.chat-area {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 40px 32px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+.msg-user { display: flex; justify-content: flex-end; }
+.msg-user-bubble {
+  background: var(--user-bubble);
+  color: var(--text-primary);
+  padding: 12px 18px;
+  border-radius: 20px 20px 4px 20px;
+  font-size: 15px;
+  line-height: 1.5;
+  max-width: 72%;
+}
+.msg-assistant { display: flex; gap: 14px; align-items: flex-start; }
+.msg-gem-avatar { width: 32px; height: 32px; flex-shrink: 0; margin-top: 2px; }
+.msg-body { flex: 1; }
+.msg-text { font-size: 15px; line-height: 1.75; color: var(--text-primary); margin-bottom: 12px; }
+.msg-text strong { font-weight: 600; }
+.source-chip {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: var(--green-light); border: 1px solid var(--green-border);
+  border-radius: 20px; padding: 4px 12px;
+  font-size: 11.5px; color: var(--green); font-weight: 500;
+}
+.no-evidence {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: #fff8e1; border: 1px solid #ffe082;
+  border-radius: 20px; padding: 4px 12px;
+  font-size: 11.5px; color: #e65100; font-weight: 500;
+}
+.typing-row { display: flex; gap: 14px; align-items: flex-start; }
+.typing-dots { display: flex; align-items: center; gap: 5px; padding: 14px 18px; background: #f1f3f4; border-radius: 20px; }
+.typing-dots span { width: 7px; height: 7px; border-radius: 50%; background: #9aa0a6; animation: blink 1.2s infinite; }
+.typing-dots span:nth-child(2) { animation-delay: .2s; }
+.typing-dots span:nth-child(3) { animation-delay: .4s; }
+@keyframes blink { 0%,80%,100%{opacity:.3} 40%{opacity:1} }
+.msg-fade { opacity:0; transform:translateY(6px); animation: fadeUp .3s ease forwards; }
+@keyframes fadeUp { to { opacity:1; transform:none; } }
+
+/* ── INPUT ───────────────────────────────────────────────── */
+.input-outer {
+  position: relative;
+  z-index: 2;
+  padding: 0 32px 24px;
+  max-width: 752px;
+  width: 100%;
+  margin: 0 auto;
+}
+.input-wrap {
+  display: flex;
+  align-items: center;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 28px;
+  padding: 10px 10px 10px 20px;
+  box-shadow: 0 1px 8px rgba(0,0,0,0.08);
+  transition: box-shadow 0.15s;
+}
+.input-wrap:focus-within { box-shadow: 0 2px 12px rgba(66,133,244,0.18); border-color: #aecbfa; }
+.input-plus {
+  width: 36px; height: 36px;
+  border: none; background: transparent;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; color: var(--text-muted);
+  border-radius: 50%;
+  transition: background 0.12s;
+  flex-shrink: 0;
+}
+.input-plus:hover { background: var(--border-light); }
+.input-wrap input {
+  flex: 1;
+  border: none; background: transparent;
+  font-family: var(--font); font-size: 15px;
+  color: var(--text-primary); outline: none;
+  padding: 0 8px;
+}
+.input-wrap input::placeholder { color: var(--text-muted); }
+.input-right { display: flex; align-items: center; gap: 4px; }
+.thinking-pill {
+  display: flex; align-items: center; gap: 5px;
+  background: transparent;
+  border: none;
+  font-size: 13px; color: var(--text-muted);
+  cursor: pointer; padding: 4px 8px;
+  border-radius: 20px;
+  transition: background 0.12s;
+  font-family: var(--font);
+}
+.thinking-pill:hover { background: var(--border-light); }
+.mic-btn {
+  width: 36px; height: 36px;
+  border: none; background: transparent;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; color: var(--text-muted);
+  border-radius: 50%;
+  transition: background 0.12s;
+}
+.mic-btn:hover { background: var(--border-light); }
+.send-btn {
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  background: var(--blue);
+  border: none; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  transition: background 0.15s;
+}
+.send-btn:hover { background: #1557b0; }
+.send-btn:disabled { background: var(--border); cursor: default; }
+.send-btn svg { width: 17px; height: 17px; fill: white; }
+
+.suggestion-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center;
+  max-width: 680px;
+}
+.chip {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 8px 16px;
+  font-size: 13.5px;
+  color: var(--text-secondary);
+  cursor: pointer;
+  font-family: var(--font);
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+.chip:hover {
+  background: var(--blue-light);
+  border-color: #aecbfa;
+  color: var(--blue);
+}
+.input-note { font-size: 11.5px; color: var(--text-muted); text-align: center; margin-top: 8px; }
+.input-note a { color: var(--blue); text-decoration: none; }
+.input-note a:hover { text-decoration: underline; }
+</style>
+</head>
+<body>
+<div class="layout">
+
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="sidebar-top">
+      <div class="sidebar-logo">
+        <svg width="28" height="28" viewBox="0 0 192 192" fill="none">
+          <path d="M96 10C96 10 62 82 62 96C62 110 96 182 96 182C96 182 130 110 130 96C130 82 96 10 96 10Z" fill="url(#s1)"/>
+          <path d="M10 96C10 96 82 62 96 62C110 62 182 96 182 96C182 96 110 130 96 130C82 130 10 96 10 96Z" fill="url(#s2)" opacity=".8"/>
+          <defs>
+            <linearGradient id="s1" x1="96" y1="10" x2="96" y2="182" gradientUnits="userSpaceOnUse"><stop stop-color="#4285F4"/><stop offset=".5" stop-color="#9B72CB"/><stop offset="1" stop-color="#D96570"/></linearGradient>
+            <linearGradient id="s2" x1="10" y1="96" x2="182" y2="96" gradientUnits="userSpaceOnUse"><stop stop-color="#4285F4"/><stop offset=".5" stop-color="#34A853"/><stop offset="1" stop-color="#F5A623"/></linearGradient>
+          </defs>
+        </svg>
+        <span class="sidebar-logo-text">Gemini</span>
+      </div>
+      <button class="sidebar-icon-btn" title="Collapse sidebar">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><rect x="3" y="3" width="18" height="18" rx="2" fill="none" stroke="currentColor" stroke-width="1.5"/><line x1="9" y1="3" x2="9" y2="21" stroke="currentColor" stroke-width="1.5"/></svg>
+      </button>
+    </div>
+
+    <div class="sidebar-nav">
+      <div class="nav-item active" onclick="resetChat()">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a1 1 0 0 0 0-1.41l-2.34-2.34a1 1 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>
+        New chat
+      </div>
+      <div class="nav-item">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        Search chats
+      </div>
+      <div class="nav-item">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+        Videos
+      </div>
+      <div class="nav-item">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="9" cy="7" r="2"/><circle cx="15" cy="7" r="2"/><circle cx="9" cy="14" r="2"/><circle cx="15" cy="14" r="2"/></svg>
+        Library
+      </div>
+      <div class="nav-item">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6z"/></svg>
+        Gems
+      </div>
+    </div>
+
+    <div class="sidebar-section-label">Recents</div>
+    <div class="recent-list" id="recent-list">
+      <div class="recent-item">What do users think of the Lightbox?</div>
+      <div class="recent-item">Why do bettors prefer PayPal?</div>
+      <div class="recent-item">How does Trustly compare to Plaid?</div>
+      <div class="recent-item">Payment lineup improvements</div>
+      <div class="recent-item">OLB user barriers research</div>
+      <div class="recent-item">Gaming consumer payment habits</div>
+    </div>
+
+    <div class="sidebar-footer">
+      <div class="avatar">T</div>
+      <div class="footer-name">
+        <strong>Trustly Research</strong>
+        <span>Work · Pro</span>
+      </div>
+      <button class="settings-btn" title="Settings">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M12 2v2m0 16v2M4.22 4.22l1.42 1.42m12.72 12.72l1.42 1.42M2 12h2m16 0h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- MAIN -->
+  <div class="main">
+    <div class="main-bg"></div>
+
+    <div class="messages" id="messages">
+      <div class="welcome" id="welcome">
+        <div class="welcome-title">What do you want to know<span class="colored">?</span></div>
+
+        <div class="suggestion-chips">
+          <button class="chip" onclick="ask('Why do users hesitate to connect their bank account?')">Why do users hesitate to connect their bank account?</button>
+          <button class="chip" onclick="ask('How does Trustly compare to Plaid?')">How does Trustly compare to Plaid?</button>
+          <button class="chip" onclick="ask('What do gaming users care about most when depositing?')">What do gaming users care about most when depositing?</button>
+          <button class="chip" onclick="ask('What should we say in the payment lineup?')">What should we say in the payment lineup?</button>
+          <button class="chip" onclick="ask('Why do users prefer PayPal over Trustly?')">Why do users prefer PayPal over Trustly?</button>
+          <button class="chip" onclick="ask('What are the main barriers to first-time adoption?')">What are the main barriers to first-time adoption?</button>
+          <button class="chip" onclick="ask('What research gaps exist?')">What research gaps exist?</button>
+          <button class="chip" onclick="ask('Who are Trustly users?')">Who are Trustly users?</button>
+        </div>
+      </div>
+      <div class="chat-area" id="chat-area" style="display:none"></div>
+    </div>
+
+    <div class="input-outer">
+      <div class="input-wrap">
+        <button class="input-plus" title="Add attachment">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        </button>
+        <input type="text" id="input" placeholder="Ask Gemini" autocomplete="off" onkeydown="if(event.key==='Enter')sendQ()">
+        <div class="input-right">
+          <button class="thinking-pill" title="Thinking mode">
+            Thinking
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+          <button class="mic-btn" title="Voice input">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+          </button>
+        </div>
+      </div>
+      <div class="input-note">
+        Research Assistant · answers from validated internal studies only ·
+        <a href="https://docs.google.com/document/d/1IBfjMt0W3riw7Ufe_IXNNxUA_Y84Wkb7/edit" target="_blank">Q&amp;A document →</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const GEM_AVATAR = `<svg width="32" height="32" viewBox="0 0 192 192" fill="none"><path d="M96 10C96 10 62 82 62 96C62 110 96 182 96 182C96 182 130 110 130 96C130 82 96 10 96 10Z" fill="url(#ag1)"/><path d="M10 96C10 96 82 62 96 62C110 62 182 96 182 96C182 96 110 130 96 130C82 130 10 96 10 96Z" fill="url(#ag2)" opacity=".75"/><defs><linearGradient id="ag1" x1="96" y1="10" x2="96" y2="182" gradientUnits="userSpaceOnUse"><stop stop-color="#4285F4"/><stop offset=".5" stop-color="#9B72CB"/><stop offset="1" stop-color="#D96570"/></linearGradient><linearGradient id="ag2" x1="10" y1="96" x2="182" y2="96" gradientUnits="userSpaceOnUse"><stop stop-color="#4285F4"/><stop offset=".5" stop-color="#34A853"/><stop offset="1" stop-color="#F5A623"/></linearGradient></defs></svg>`;
+
+const KB = [
+
+  // ── SCOPE & CONTEXT ──────────────────────────────────────
+  { kw:["who is trustly","what is trustly","trustly company","about trustly","what does trustly do","trustly product","trustly service","tell me about trustly"],
+    a:"Trustly is a global payment company that enables direct bank payments — letting users pay and get paid directly from their bank account, without cards or e-wallets. In the gaming and sports betting context, Trustly operates a payment flow called the Lightbox, where users connect their bank account and authorise deposits within a merchant checkout.<br><br>This assistant answers questions grounded in <strong>Trustly internal UX research</strong> — studies produced by the Product Research team on how users perceive and interact with Trustly products.",
+    s:"Context — Research Assistant scope" },
+
+  { kw:["what studies","which studies","what research","what is in the repository","what do you know","what can you answer","scope","coverage","available"],
+    a:"The repository currently covers three validated studies:<br><br><strong>Lightbox Perception Benchmark — Lightbox Perception Benchmark</strong><br>How US sports bettors perceive Trustly Standard and four competitor payment flows across usability, trust, speed, and brand recall. 100 participants, between-subject design.<br><br><strong>Payment Line-Up Expectations — Payment Line-Up Expectations</strong><br>How users form expectations about Trustly from the payment lineup before entering the flow. 69 participants, US online shoppers.<br><br><strong>Trustly Gaming Consumers — Trustly Gaming Consumers</strong><br>What drives gaming and sports betting users to choose Trustly, and what information they need before the experience. 60 participants, three groups.",
+    s:"Research Assistant — repository index" },
+
+  { kw:["what is olb","what is online banking","what is pay by bank","olb meaning","bank payment","bank transfer","direct bank"],
+    a:"OLB stands for Online Banking — a payment method where users connect their bank account and authorise a direct transfer, rather than paying by card or e-wallet. In the Trustly context, this means users sign in with their bank credentials through the Trustly Lightbox to fund their account.<br><br>Familiarity with OLB is one of the most important segmentation variables in Trustly research. Users who have previously used bank-linked payments behave and respond very differently from users encountering the category for the first time.",
+    s:"Context — OLB definition" },
+
+  { kw:["what is a gem","what is gemini","how does this work","how does the assistant work","what is this","what is the research assistant","how does it answer"],
+    a:"This Research Assistant is a prototype built on Gemini — Google's AI environment already available at Trustly. It answers questions exclusively from validated internal UX research studies. It never invents data, never extrapolates beyond the evidence, and always tells you which study an answer comes from.<br><br>When a question isn't covered by any study in the repository, it says so clearly — and flags it as a potential gap worth researching.",
+    s:"Context — Research Assistant scope" },
+
+  // ── TRUSTLY USER PROFILE ────────────────────────────────
+  { kw:["trustly users","trustly user profile","who are trustly users","what do we know about trustly users","trustly user behavior","trustly recurrent","frequent trustly","trustly adopter","trustly customers"],
+    a:"Across the three studies in the repository, a consistent profile of Trustly users emerges — and it is worth understanding what makes them distinctive.<br><br><strong>They are heavier gambling consumers.</strong> In the Trustly Gaming Consumers study, Trustly users reported the highest frequency of online betting use (92.5% frequent or very frequent) and the highest median annual gambling spend ($3,500 vs $875 for competitor users). They are not casual bettors who happen to use Trustly — they are engaged users who have integrated it into an active betting habit.<br><br><strong>They are payment-sophisticated, not payment-exclusive.</strong> Trustly users in Trustly Gaming Consumers averaged 3.05 payment types per person — the highest of any group. They also use cards, e-wallets, and sometimes crypto. Trustly adoption does not replace other methods; it sits alongside them as the right choice for a specific context.<br><br><strong>They are financially established.</strong> Across Lightbox Perception Benchmark and Trustly Gaming Consumers, Trustly-familiar participants skewed 30s–40s, high income, highly educated, full-time employed. Their concerns are not about access or digital literacy — they are about trust, control, and habit.<br><br><strong>Once familiar, they commit.</strong> In Lightbox Perception Benchmark, familiar users rated every flow more positively across all dimensions. In Trustly Gaming Consumers, 17 of 20 Trustly recurrent users chose Trustly on the first attempt in the payment lineup. Familiarity is a multiplier — the challenge is building it.",
+    s:"2022 · Trustly Gaming Consumers + 2025 · Lightbox Perception Benchmark — who Trustly users are across the research" },
+
+    // ── Lightbox Perception Benchmark: OVERALL PERFORMANCE ───────────────────────────
+  { kw:["trustly standard","performing","well","competitor","compare","comparison","benchmark","how is trustly","how does trustly"],
+    a:"On speed and usability, Trustly Standard is genuinely competitive — it was consistently perceived as the fastest-feeling flow, and ease ratings were high across all five products. That is the good news, and it is real.<br><br>The problem is strategic, not operational. Only <strong>50% of participants recalled Trustly Standard</strong> after the session. And the trust they felt during the flow was mostly borrowed from the bank — from Chase's logo, the bank login screen — not from Trustly as a brand in its own right. A smooth experience that leaves no brand trace is commercially fragile: users who cannot connect a positive deposit to the Trustly name are not building loyalty to Trustly. They are building loyalty to bank payment in general, which any competitor can offer.",
+    s:"2025 · Lightbox Perception Benchmark — speed perception, brand recall, and borrowed trust findings" },
+
+  // ── Lightbox Perception Benchmark: MOST IMPORTANT FINDING ───────────────────────
+  { kw:["most important finding","single most important","key finding","main finding","biggest finding","top finding","what did the study find","what was found","headline finding","number one finding"],
+    a:"The single most important finding is one that reframes the problem. <strong>OLB familiarity explained more variation in perception than the product itself</strong> — more than which flow was shown, more than the design of the interface.<br><br>Familiar users rated everything more positively. Unfamiliar users completed the same flows but with substantially more uncertainty about whether it was safe to proceed. The gap was largest on trust and security items, not on ease or speed.<br><br>What this means in practice: the main barrier to adoption is not a design flaw you can fix by simplifying the interface. It is a context gap — users do not have the mental model to evaluate whether this is safe. The interface needs to build that model before asking them to connect their bank account.",
+    s:"2025 · Lightbox Perception Benchmark — OLB familiarity as the main driver of trust perception" },
+
+  // ── Lightbox Perception Benchmark: OLB UNFAMILIAR ───────────────────────────────
+  { kw:["unfamiliar","olb unfamiliar","new user","first time","never used","hesitat","trust gap","uncertain","barrier","drop off","abandon"],
+    a:"OLB-unfamiliar users present a specific kind of problem — not confusion, but <strong>absence of context</strong>. They completed the flow. They understood the steps. But they could not decide whether the experience was safe enough, because nobody had told them what Trustly is, why it needs bank access, or who is responsible if something goes wrong.<br><br>Some finished the task and said they would want to research the provider before doing it for real. Others resolved their discomfort only because the simulation felt low-stakes. In a live transaction, with real money, that residual uncertainty becomes the mechanism behind second-session hesitation and long-term avoidance.<br><br>The product cannot just work for these users — it needs to explain itself to them before asking for their credentials.",
+    s:"2025 · Lightbox Perception Benchmark — OLB familiarity as the main driver of trust perception" },
+
+  // ── Lightbox Perception Benchmark: PLAID ────────────────────────────────────────
+  { kw:["plaid","brand recall","high recall","low trust","data","permission","recall versus trust","recall vs trust","noticed","visible"],
+    a:"Plaid is the most instructive contrast case in the study — not as a model to follow, but as a warning.<br><br>Plaid was recalled by <strong>95% of participants</strong>, the highest of any flow. But its trust and security ratings were directionally the lowest. The mechanism is the same thing: Plaid's data permission screens made the brand highly visible, which made it memorable. But that same visibility drew attention to the breadth of data being requested, and participants questioned whether all that access was necessary.<br><br>The lesson for Trustly is precise: <strong>recall and trust are separate assets that can move in opposite directions.</strong> Trustly should build brand visibility — but not by making data requests more visible. The goal is to be remembered for the experience, not for the access.",
+    s:"2025 · Lightbox Perception Benchmark — Plaid brand recall vs trust: why they moved in opposite directions" },
+
+  // ── Lightbox Perception Benchmark: TRUSTLY PASS / FRICTION ──────────────────────
+  { kw:["friction","trustly pass","pass","verification","mfa","phone","email","extra step","security step","reassurance","help or hurt","obstacle","authentication"],
+    a:"The Trustly Pass finding is one of the more nuanced results in the study. The additional verification steps — phone and email confirmation — were not experienced the same way by all users.<br><br>Familiar users read them as <strong>protection signals</strong>. They understood the logic: if someone else gets your credentials, they still cannot deposit without access to your phone. That interpretation produced higher security ratings.<br><br>Unfamiliar users encountered the same steps without the interpretive frame. They completed them, but rated security with more uncertainty. The steps did not resolve their anxiety — they just added wait time.<br><br>The design implication is clear: friction only earns its value when the user understands what it protects. Each added step needs a specific explanation, not a generic 'for your security' label.",
+    s:"2025 · Lightbox Perception Benchmark — how friction in Trustly Pass is interpreted differently by familiar and unfamiliar users" },
+
+  // ── Lightbox Perception Benchmark: SPEED ────────────────────────────────────────
+  { kw:["speed","fast","fastest","quick","efficient","instant","time","how long","slow","transaction speed"],
+    a:"Speed is Trustly Standard's most defensible competitive claim in this dataset — and it is real, but contextual.<br><br>Participants consistently described the flow as completing in a single step, going through immediately, with no unnecessary effort. In a sports betting context, where the deposit is an interruption to the user's actual goal, that matters more than in a general e-commerce setting. The faster the deposit, the less it costs the user in attention and patience.<br><br>The caveat worth knowing: the first deposit is slower, because the bank connection step adds setup time. <strong>The speed advantage compounds on repeat use.</strong> That means the first experience needs to manage expectations — not oversell speed before the connection step has happened.",
+    s:"2025 · Lightbox Perception Benchmark — speed as Trustly Standard's most defensible competitive claim" },
+
+  // ── Lightbox Perception Benchmark: BRAND RECALL ─────────────────────────────────
+  { kw:["brand recall","recall","recognition","brand memory","brand awareness","logo","remembered","remember the name","brand imprint"],
+    a:"Brand recall across the five flows tells a sharp story:<br><br>Plaid 95% · Trustly Pass 75% · Stripe 65% · <strong>Trustly Standard 50%</strong> · Link 40%<br><br>Trustly Standard's smoothness is the ironic explanation. The flow works so well that there are few moments where the brand registers. Plaid and Trustly Pass both had branded screens that demanded attention — Plaid's data permissions, Trustly Pass's verification steps. Trustly Standard's lack of friction compressed the number of brand-contact moments per session.<br><br>A positive experience that leaves no brand trace does not build loyalty. It builds familiarity with the category. The next step for Trustly Standard is lightweight brand reinforcement at key moments — flow entry, bank confirmation, deposit success — without adding friction.",
+    s:"2025 · Lightbox Perception Benchmark — brand recall across five payment flows and what smoothness costs" },
+
+  // ── Lightbox Perception Benchmark: BORROWED TRUST ───────────────────────────────
+  { kw:["borrowed trust","bank trust","chase","build trust","trustly brand","brand trust","rely on bank","attributed to bank","owns trust"],
+    a:"The pattern across Trustly Standard sessions is consistent: when participants explained why they trusted the flow, they pointed to the bank. Chase's login screen. The bank logo. The phrase 'going directly through my bank.'<br><br>Trustly's own name came up rarely as an active trust signal. This borrowed trust is commercially fragile — <strong>a user who trusts Chase will trust any provider that connects through Chase.</strong> Trustly can be replaced without meaningful resistance.<br><br>The path forward is not to remove the bank from the trust equation — that reassurance is valuable. It is to ensure Trustly becomes visible alongside the bank, positioned as the secure mechanism enabling the transaction, so a positive experience becomes associated with both names, not just one.",
+    s:"2025 · Lightbox Perception Benchmark — trust attributed to the bank, not to Trustly" },
+
+  // ── Lightbox Perception Benchmark: COMPETITOR ───────────────────────────────────
+  { kw:["competitor","watch","stripe","link","threat","rival","benchmark against","focus on","who should trustly watch"],
+    a:"Stripe is the most productive comparison for Trustly to investigate further. It appeared directionally strongest on trust and security items across the study, and participants in the Stripe condition cited brand credibility and association with known institutions as the basis for their confidence. The study does not prove Stripe is better designed — it generates a testable hypothesis worth following up through qualitative work or A/B testing.<br><br>Plaid is the most instructive contrast in the other direction: it shows what happens when brand visibility is achieved at the cost of data comfort. High salience that amplifies data concerns is not a model to replicate.",
+    s:"2025 · Lightbox Perception Benchmark — competitor analysis and strategic implications" },
+
+  // ── Lightbox Perception Benchmark: WHAT TO TEST NEXT ────────────────────────────
+  { kw:["test next","next step","intervention","improve","recommendation","design change","roadmap","action","next research","what should trustly do"],
+    a:"The study identified where the trust gap lives — before and during the bank-connection step — but did not test whether specific changes close it. The most productive next step is moving from measuring perception to testing interventions in a live flow.<br><br>The highest-value interventions to test:<br>· A brief explanation of what Trustly's role is before the bank credential step<br>· Visible Trustly branding at the confirmation screen<br>· A data-scope statement that explicitly limits what is collected<br>· Bank endorsement cues positioned before the credential prompt<br><br>The outcome variable should be completion and return rate — not self-reported satisfaction, which has already reached its usefulness as a measurement in this category.",
+    s:"2025 · Lightbox Perception Benchmark — competitor analysis and strategic implications" },
+
+  // ── Lightbox Perception Benchmark: STANDARD VS PASS ─────────────────────────────
+  { kw:["standard vs pass","trustly pass vs standard","same product","two versions","difference between standard and pass","which one","choose between standard"],
+    a:"The data is clear: these are different tools for different moments, not two versions of the same product.<br><br><strong>Trustly Standard</strong> is optimised for familiar users making a fast, time-sensitive deposit. It minimises interruption. It aligns with the user's actual motivation — to get back to betting, not to set up an account.<br><br><strong>Trustly Pass</strong> is better suited to first-time account saving, higher-stakes connections, and situations where brand memory and security reassurance matter more than raw speed.<br><br>The quantitative data showed almost no perceptual difference between the two in Likert ratings — but that near-equivalence likely masks the context-specific value each carries. Choosing between them should depend on what the user is trying to do, not on average perception scores.",
+    s:"2025 · Lightbox Perception Benchmark — how friction in Trustly Pass is interpreted differently by familiar and unfamiliar users + Section 8" },
+
+  // ── Lightbox Perception Benchmark: USABILITY ────────────────────────────────────
+  { kw:["usability","easy to use","easy","intuitive","understand","simple","navigation","clear","confus","ux quality"],
+    a:"All five flows were rated as easy and intuitive — and that near-unanimity is itself the finding. It means usability has become a category baseline in bank-linked payment, not a differentiator.<br><br>The data is already near the ceiling of the scale (4.75–4.8 out of 5 across all products), which limits its usefulness for comparing products. What the data confirms is that the competitive problem is not usability. Users can complete the flow. The challenge is whether they trust it enough to start, and whether they remember who made it work.",
+    s:"2025 · Lightbox Perception Benchmark — usability parity across all five flows" },
+
+  // ── Lightbox Perception Benchmark: LIMITATIONS ──────────────────────────────────
+  { kw:["limitation","caveat","cannot tell","what the study cannot","not reliable","confidence","caution","weakness","prototype study"],
+    a:"Three limitations matter most when using this study for design decisions:<br><br><strong>Product differences are directional, not confirmed.</strong> With 20 participants per condition and no significance testing, any ranking of the five flows is a hypothesis, not a finding.<br><br><strong>Ceiling effects compress the data.</strong> When most people rate everything positively, the instrument cannot distinguish between genuinely similar products and products whose differences are too subtle for this scale to detect.<br><br><strong>Prototype context understates real barriers.</strong> Participants used simulated banking information with no real money at stake. Trust responses in a prototype study are best-case estimates — real barriers in a live transaction are likely at least as strong.",
+    s:"2025 · Lightbox Perception Benchmark — study limitations and caveats for design decisions" },
+
+  // ── Lightbox Perception Benchmark: ICR / CONVERSION ─────────────────────────────
+  { kw:["icr","conversion","abandon","completion rate","drop off","funnel","convert","does it improve conversion"],
+    a:"This study cannot answer the ICR question directly — it was not designed to. Participants completed a prototype task, not a live transaction, so there is no abandonment data, no conversion rate, and no measurement of where users drop off in a real flow.<br><br>What the study can tell us is where hesitation concentrates — in unfamiliar users, in the moments before and during the bank-connection step — and what contextual signals are most likely to reduce it. Converting that into ICR impact requires testing specific interventions in a live flow against actual completion and return rate.",
+    s:"2025 · Lightbox Perception Benchmark — competitor analysis and strategic implications" },
+
+  // ── Lightbox Perception Benchmark: FAMILIARITY GAP ──────────────────────────────
+  { kw:["familiarity gap","familiar users","unfamiliar users","olb familiarity","familiarity difference","prior experience","olb experience"],
+    a:"The familiarity gap is the strongest and most reliable signal in the entire dataset — precisely because it holds across all five product conditions. It is not a product story; it is an audience story.<br><br>Familiar users rated trust, security, and comfort with banking information substantially higher. Unfamiliar users rated ease and speed similarly — the operational experience is accessible — but stalled on the trust dimensions.<br><br>Why does this matter if both groups completed the task? Because completion in a prototype study is not the same as willingness to return. Unfamiliar users who finished the flow often qualified their experience: 'I would want to research this before using it for real.' In a live context, that qualification becomes hesitation, avoidance, and churn.",
+    s:"2025 · Lightbox Perception Benchmark — why the familiarity gap matters even when both groups complete the task" },
+
+  // ── Payment Line-Up Expectations: PAYMENT LINEUP ───────────────────────────────
+  { kw:["payment lineup","line up","lineup","payment list","checkout","payment options","payment screen","payment choice","how trustly appears"],
+    a:"The Payment Line-Up Expectations study (Payment Line-Up Expectations) looked at what users understand about Trustly before they click — and the finding is precise: <strong>96% of participants correctly anticipated the general category</strong> (bank connection, direct transfer, some credentials). The lineup already does its first job.<br><br>What it does not do is explain the mechanics. Users know something bank-related will happen but do not know which credentials will be required, what Trustly's role is, or what the merchant can and cannot do with their account. That uncertainty is not neutral — it creates space for worst-case assumptions.<br><br>The most valuable improvement to the lineup is not repeating what users already infer. It is filling the gaps they cannot fill themselves.",
+    s:"2022 · Payment Line-Up Expectations — what users understand about Trustly before they click" },
+
+  // ── Payment Line-Up Expectations: CREDENTIAL CONFUSION ─────────────────────────
+  { kw:["credential","routing number","account number","bank login","username password","what credentials","bank details","sensitive information","bank information"],
+    a:"Credential expectations are the sharpest expectation gap in the Payment Line-Up Expectations study. 31% of participants expected to enter some form of bank credentials — but most guessed the wrong ones. Only 3 participants correctly anticipated username and password. 10 expected account and routing number.<br><br>That distinction matters a great deal. Account and routing number feels more invasive, more permanent, and more dangerous than a bank login. Users who expect routing numbers mentally prepare for a higher-stakes action than the actual experience requires.<br><br><strong>'No account or routing number needed'</strong> turned out to be one of the strongest positive surprises after the flow — which means the lineup should say it before the flow, not let users discover it after they have already worried about it.",
+    s:"2022 · Payment Line-Up Expectations — credential ambiguity as the main pre-click anxiety" },
+
+  // ── Payment Line-Up Expectations: BEFORE VS AFTER ──────────────────────────────
+  { kw:["before and after","before vs after","expectation vs reality","first impression","pre click","post flow","improves after","attitudes improve","flow performs"],
+    a:"One of the cleanest findings in the Payment Line-Up Expectations study is the before-vs-after gap. Every measured attitude improved after users completed the Trustly flow:<br><br>Ease of use +1.12 · Security evaluation +0.81 · Feelings of security +0.86 · Reliability +0.63<br><br>The experience is better than the expectation. Users overestimate friction, underestimate ease, and overestimate the risk of credentials. Once they go through the flow, those concerns are mostly resolved.<br><br>The strategic implication is uncomfortable: <strong>Trustly's biggest barrier is not the product — it is the gap between what the lineup communicates and what the flow actually delivers.</strong> The design investment should be disproportionately focused on the pre-click state.",
+    s:"2022 · Payment Line-Up Expectations — how all measured attitudes improved after completing the flow" },
+
+  // ── Payment Line-Up Expectations: COMPETITIVE DEFAULTS ─────────────────────────
+  { kw:["credit card","paypal","default","preferred method","why not trustly","inertia","habit","switch","competitor preference","real life choice"],
+    a:"The competitive reality from the Payment Line-Up Expectations study is sobering: <strong>69% of participants said they would choose credit card or PayPal in a real checkout</strong>. Only 9% chose Trustly — and those were exclusively users already familiar with online banking payment.<br><br>The reasons are not primarily about Trustly failing. They are about what credit cards and PayPal offer that bank payment does not: rewards and cash back, dispute rights, stored credentials, an intermediary layer that feels protective. These are not perception problems — they are value proposition differences.<br><br>Trustly cannot beat those defaults through interface improvement alone. It needs equally clear shortcuts in the lineup: fast, secure, no routing number, bank-level authentication, and a clear statement of who is responsible.",
+    s:"2022 · Payment Line-Up Expectations — why 69% would still choose credit card or PayPal in a real checkout" },
+
+  // ── Payment Line-Up Expectations: WILLINGNESS ──────────────────────────────────
+  { kw:["willingness","would use","will use","adoption","62","37","willing to use trustly","use trustly after","acceptance"],
+    a:"After experiencing the Trustly flow, <strong>62.3% of participants said they would use it</strong>. 37.7% would not.<br><br>The positive drivers: ease and speed (strongest), security (second), convenience. The negative drivers: lack of rewards (strongest — 14 mentions), preference for existing methods, security perceptions in favour of cards, and discomfort with direct bank access.<br><br>The 37.7% who would not use it are not all the same problem. Some are rewards-driven (hard to convert without a value proposition change). Some have security concerns (addressable through better communication). Some are simply habitual (may convert on repeated exposure). Treating them as one group would produce the wrong solution.",
+    s:"2022 · Payment Line-Up Expectations — who would use Trustly after seeing it, and who would not" },
+
+  // ── Trustly Gaming Consumers: GAMING CONSUMERS ─────────────────────────────
+  { kw:["gaming consumer","gaming user","sports bettor","bettor","sportsbook","gambling","betting","gaming","sports betting user","what gamers want"],
+    a:"The Trustly Gaming Consumers study (Trustly Gaming Consumers) looked at 60 sports betting users across three groups — Trustly recurrent users, competitor (Plaid/Mazooma) users, and other method (card/PayPal/Apple Pay) users.<br><br>The top factor for choosing a funding method was <strong>feelings of security</strong> (30 mentions), followed by transaction speed (21) and ease of use (20). But the finding behind the finding is more interesting: 'feelings of security' for gamers is not primarily about fraud protection. It is about the absence of hassle — confidence that the transaction will go through cleanly, that funds will be available immediately, and that there will be recourse if something goes wrong.<br><br>Speed matters in a specific way for bettors: they are trying to get to the bet, not manage a payment experience. Any friction in the funding step is experienced as friction on the way to the thing they actually want.",
+    s:"2022 · Trustly Gaming Consumers — what sports bettors care about when choosing a deposit method" },
+
+  // ── Trustly Gaming Consumers: LINEUP POSITION ──────────────────────────────
+  { kw:["lineup position","first position","last position","position in lineup","placement","where trustly","order","first or last"],
+    a:"The Trustly Gaming Consumers study tested Trustly in first and last position in the payment lineup for users unfamiliar with Pay-by-Bank — and the difference is stark.<br><br>When Trustly appeared first, the average number of attempts before selecting it was <strong>1.65</strong>. When Trustly appeared last, it rose to <strong>3.2</strong> — nearly double.<br><br>In first position, 12 out of 20 unfamiliar users chose Trustly on the first attempt. In last position, only 2 out of 20 did, and 11 reached it only on the fourth attempt (after exhausting every other option).<br><br>Placement is not a cosmetic decision. For users unfamiliar with the category, it is the difference between considering Trustly and only landing on it by elimination.",
+    s:"2022 · Trustly Gaming Consumers — how lineup position nearly doubles the number of attempts before users choose Trustly" },
+
+  // ── Trustly Gaming Consumers: CHOOSING PATTERN ─────────────────────────────
+  { kw:["choosing pattern","first attempt","selected trustly","which users chose","who chose trustly","selection rate","choose trustly first","did users choose"],
+    a:"The choosing pattern results reveal how prior familiarity shapes first-click behaviour:<br><br><strong>Trustly recurrent users:</strong> 17 of 20 chose Trustly on the first attempt.<br><strong>Other method users (card/PayPal):</strong> 12 of 20 chose it first — higher than expected.<br><strong>Competitor users (Plaid/Mazooma):</strong> only 8 of 20 chose it first, with 10 selecting it on the second attempt after their preferred option was unavailable.<br><br>The competitor-user result is the most interesting: these users know bank-linked payment but prefer a different provider. They need a reason to switch — familiarity with the category is not enough.",
+    s:"2022 · Trustly Gaming Consumers — how prior familiarity shapes first-click behavior across three user groups" },
+
+  // ── Trustly Gaming Consumers: WHAT TO COMMUNICATE ──────────────────────────
+  { kw:["what to communicate","messaging","what should trustly say","what users need to know","communication","in product messaging","key message","messaging guidelines"],
+    a:"The Trustly Gaming Consumers study produced a ranked list of what new users need to know before choosing Trustly. The top priorities:<br><br>1. <strong>Trustly is the extra layer of protection</strong> — not the bank, not the merchant. It is the security buffer between the user's bank account and the sportsbook.<br>2. Your bank is a partner and is aware of this transaction.<br>3. The process is faster than you expect — fewer steps, sign in and choose your account, done.<br>4. You will not need your routing or account number.<br>5. Funds are instantly available to place your bet.<br>6. There are no associated fees.<br><br>The research recommendation is precise: do not say 'easy' and 'secure' without showing what those words mean. 'Easy' needs to become 'no routing number, two steps, sign in and go.'",
+    s:"2022 · Trustly Gaming Consumers — ranked list of what new users need to know before choosing Trustly" },
+
+  // ── Trustly Gaming Consumers: RATINGS ──────────────────────────────────────
+  { kw:["rating","score","7 point","scale","evaluation","trustly users rate","how did users rate","satisfaction","perception score"],
+    a:"Post-flow ratings on a 7-point scale showed consistently high scores across all three groups, with Trustly recurrent users rating highest:<br><br>Ease of use: 6.95 (Trustly users) · 6.80 (competitor users) · 6.55 (other method users)<br>Reliability: 6.80 · 6.50 · 6.30<br>Would use: 6.75 · 6.40 · 6.30<br>Security: 6.50 · 6.35 · 6.15<br><br>The pattern confirms what other studies show: the experience works well once users complete it. The gaps between groups are modest — suggesting the post-flow experience is broadly positive regardless of prior familiarity. The problem is not the product. It is getting users to try it.",
+    s:"2022 · Trustly Gaming Consumers — post-flow ratings across Trustly users, competitor users, and other method users" },
+
+  // ── CROSS-STUDY: SECURITY ────────────────────────────────
+  { kw:["security","safe","secure","trust","fraud","protection","risk","bank account","feel safe","worry","concern","anxiety"],
+    a:"Security is the central theme across all three studies in the repository — and the finding is consistent: <strong>security perception is driven more by context and familiarity than by the product itself.</strong><br><br>In Lightbox Perception Benchmark, familiar users rated security substantially higher across all five flows — the product barely mattered. In Payment Line-Up Expectations, credential ambiguity (routing number vs. bank login) was the main anxiety driver before the flow. In Trustly Gaming Consumers, 'feelings of security' was the top factor for method choice — but gamers defined it as absence of hassle and confidence in recourse, not primarily as fraud protection.<br><br>The common thread: users need to know who is responsible, what access is being granted, and what cannot happen — before they are asked to connect their bank. Generic 'safe and secure' language does not answer those questions.",
+    s:"Lightbox Perception Benchmark · Payment Line-Up Expectations · Trustly Gaming Consumers — cross-study theme" },
+
+  // ── CROSS-STUDY: SPEED ───────────────────────────────────
+  { kw:["speed across studies","instant","fast","speed in gaming","immediate access","funds available","transaction speed theme"],
+    a:"Speed means something specific in the gaming context that general payment research may miss. Gamers are not trying to complete a payment experience — they are trying to get to the bet. The deposit is an interruption, and any friction on that path is experienced as friction on the way to the thing they actually want.<br><br>Across studies: Lightbox Perception Benchmark found Trustly Standard perceived as fastest. Trustly Gaming Consumers found transaction speed the second most important factor (after security) for method choice. Payment Line-Up Expectations found ease of use the largest attitude improvement after the flow (+1.12 on a 7-point scale).<br><br>The consistent implication: speed should be made concrete in the lineup. Not 'fast' as a claim, but 'no routing number, sign in, choose account, done' as a description.",
+    s:"2022–2025 · across all three studies — security perception as a consistent cross-study theme" },
+
+
+  // ── PM: PRIORITIZATION ───────────────────────────────────
+  { kw:["prioritize","priority","what should we focus","where to invest","biggest opportunity","highest impact","most important change","where to start","what to fix first","quick win"],
+    a:"Based on the evidence across three studies, the highest-leverage investment is <strong>the pre-click experience</strong> — what the payment lineup communicates before users make a decision.<br><br>The Payment Line-Up Expectations study showed that all measured attitudes improve significantly after users complete the flow (+1.12 on ease, +0.86 on security). The product works. The problem is the gap between what users expect before clicking and what the experience actually delivers. If Trustly can close that gap — by reducing credential ambiguity, making its role explicit, and setting accurate expectations — it removes the main barrier without changing the flow itself.<br><br>Second priority: brand visibility at key moments post-flow (confirmation screen, deposit success). The experience is positive but leaves no brand trace — 50% recall in Lightbox Perception Benchmark. That is a compounding problem for retention and loyalty.",
+    s:"2022 · Payment Line-Up Expectations + 2025 · Lightbox Perception Benchmark — pre-click experience as the highest-leverage investment" },
+
+  // ── PM: LIGHTBOX VS LINEUP ────────────────────────────────
+  { kw:["lightbox vs lineup","lineup or lightbox","improve lightbox","improve lineup","which to improve","lightbox first","lineup first","where to redesign"],
+    a:"The research points clearly toward <strong>the lineup as the higher-leverage investment</strong> for adoption, at least for new users.<br><br>The Lightbox already works well once users enter it — post-flow ratings are high across all groups, and 36.8% of Payment Line-Up Expectations participants were positively surprised. The flow is not the problem. The problem is that too many users arrive at the flow with wrong expectations, excessive credential anxiety, and insufficient understanding of what Trustly is.<br><br>Improving the lineup — clarifying credentials, making Trustly's role visible, stating what will not be required — is likely to produce conversion gains without touching the flow at all. Improving the Lightbox further would improve an experience that already tests well.",
+    s:"2022 · Payment Line-Up Expectations — why improving the lineup matters more than improving the flow" },
+
+  // ── PM: FIRST-TIME ADOPTION ───────────────────────────────
+  { kw:["first time","first use","new user","first adoption","first deposit","first time user","barrier to first use","why dont users try","why wont users try","first click"],
+    a:"First-time adoption is where the evidence concentrates the problem. Three mechanisms work against it:<br><br><strong>1. Credential anxiety.</strong> 31% of Payment Line-Up Expectations participants expected to enter account and routing numbers — a more invasive action than the actual flow requires. Users who expect routing numbers mentally prepare for a higher-stakes experience than they will actually face.<br><br><strong>2. Unknown actor.</strong> Users see 'bank connection' but cannot identify who Trustly is or who is responsible if something goes wrong. Trustly Gaming Consumers found that first-time users need to know Trustly is the security layer between their bank and the merchant — not the merchant taking direct access.<br><br><strong>3. Competitive defaults.</strong> 69% of Payment Line-Up Expectations participants would choose credit card or PayPal in a real checkout. Trustly is not competing against user unwillingness — it is competing against entrenched habits with strong perceived protection.<br><br>All three are addressable through lineup messaging, not flow redesign.",
+    s:"2022 · Payment Line-Up Expectations + 2022 · Trustly Gaming Consumers — three mechanisms behind first-time adoption failure" },
+
+  // ── PM: WHY USERS ABANDON ─────────────────────────────────
+  { kw:["abandon","drop off","why leave","why not complete","why users leave","churn","exit","not finish","give up","why users dont complete"],
+    a:"The studies do not measure live abandonment directly — all used prototype or observed tasks. But the evidence identifies the most likely abandonment drivers:<br><br><strong>Credential ambiguity</strong> is the highest-risk moment. Users who expect to enter routing numbers may exit rather than proceed when they are not sure what information will be asked of them. The anticipation of a high-friction action is enough to produce exit before the friction actually appears.<br><br><strong>Unfamiliar users hitting the bank connection step</strong> without having been told what Trustly is or what the step protects. In Lightbox Perception Benchmark, unfamiliar users expressed substantially more uncertainty at that point — and in a real transaction, that uncertainty becomes a reason to stop.<br><br><strong>Measuring actual abandonment</strong> — timing, drop-off point, user segment — requires a live behavioral study. The prototype studies identify where the risk is highest, not where it converts into exits.",
+    s:"Payment Line-Up Expectations · Credential gap · 2025 · Lightbox Perception Benchmark — OLB familiarity as the main driver of trust perception" },
+
+  // ── PM: WHY USERS PREFER PAYPAL ──────────────────────────
+  { kw:["paypal","why paypal","prefer paypal","paypal vs trustly","paypal instead","paypal better","why not trustly instead of paypal"],
+    a:"PayPal's advantage over Trustly is not primarily about the product experience — it is about the mental model users already have.<br><br>PayPal means: stored credentials so no re-entry, an intermediary layer that feels protective, dispute rights if something goes wrong, and a brand users have trusted for years across many merchants. It also means not exposing a bank account directly — PayPal sits between the user and their bank, which many users prefer as a buffer.<br><br>In Payment Line-Up Expectations, 25% of participants would choose PayPal in a real checkout. The reasons: convenience (stored info), protection perception, and familiarity. Trustly's counter-argument — faster, bank-level security, no routing number — only lands if it reaches users before they default to what they already know.",
+    s:"2022 · Payment Line-Up Expectations — why PayPal's mental model advantage is structural, not a UX problem" },
+
+  // ── PM: WHAT TO SAY IN THE LINEUP ────────────────────────
+  { kw:["what to say","lineup message","payment lineup copy","messaging in lineup","what copy","lineup text","benefit message","what message","communication in product"],
+    a:"The Trustly Gaming Consumers and Payment Line-Up Expectations studies together produce a clear messaging hierarchy for the payment lineup:<br><br><strong>What users cannot infer and most need to know:</strong><br>1. Trustly is the security layer — not the bank, not the merchant. It is the buffer that handles the transaction.<br>2. No account or routing number required — sign in with your bank username and password.<br>3. Your bank is a partner in this transaction and is aware of it.<br>4. Funds are available instantly.<br>5. No fees.<br><br><strong>What not to say:</strong> Do not repeat what the bank icon array already communicates (bank connection, direct transfer). Users already infer that. And do not use abstract terms like 'safe' and 'easy' without anchoring them — 'easy' needs to mean 'two steps, sign in, choose account, done.'",
+    s:"Trustly Gaming Consumers · Slide 13 · Payment Line-Up Expectations · Design implications" },
+
+  // ── PM: RESEARCH GAPS ─────────────────────────────────────
+  { kw:["research gap","what we dont know","missing research","gap","what hasnt been studied","what research is missing","open question","unanswered","what should we research next"],
+    a:"Several important questions are not covered by the current repository:<br><br><strong>Live conversion behavior.</strong> None of the studies measure actual abandonment, drop-off timing, or real ICR impact. All used prototype or observed tasks. The gap between prototype completion and live completion is unknown.<br><br><strong>Lower-income and lower-familiarity users.</strong> All three studies recruited high-income, highly educated, digitally fluent participants. How users with less financial confidence or less digital experience perceive Trustly is unstudied.<br><br><strong>Specific messaging interventions.</strong> Studies identified what users need to know, but did not A/B test specific copy or design treatments against conversion outcomes.<br><br><strong>Return use and retention.</strong> How often do first-time users become repeat users? What drives that transition? Not covered.<br><br><strong>Mobile vs desktop experience differences.</strong> Not studied in the current repository.",
+    s:"2022–2025 · across all three studies — research gaps not covered by the current repository" },
+
+  // ── PM: ROI / VALUE OF RESEARCH ──────────────────────────
+  { kw:["value of research","roi","why does this matter","business case","impact","why invest in research","research value","what does research give us"],
+    a:"The three studies in the repository give product teams something precise: <strong>they locate the problem</strong>.<br><br>Without the Payment Line-Up Expectations study, a team might invest in redesigning the Lightbox to improve ease of use — but ease of use is already near ceiling. The study shows the barrier is pre-click, not in-flow.<br><br>Without the Lightbox Perception Benchmark study, a team might assume Trustly's trust problem is a product quality issue — but the data shows familiar users rate every flow positively. The problem is audience-specific, not product-specific.<br><br>Without Trustly Gaming Consumers, a team might message 'safe and easy' generically — but the study shows gamers need specifics: no routing number, instant funds, two steps, bank as partner.<br><br>In each case, the research changes where the investment goes — from building more to communicating better.",
+    s:"2022–2025 · across all three studies — how research changes where product investment goes" },
+
+  // ── PM: SEGMENTATION ─────────────────────────────────────
+  { kw:["segment","segmentation","which users","user types","different users","different groups","user group","target audience","who to target","which audience"],
+    a:"The research supports three meaningful segmentation variables for product and messaging decisions:<br><br><strong>OLB familiarity (most important).</strong> Familiar users need differentiation — why Trustly over their usual method. Unfamiliar users need orientation first — what this is, what will happen, who is responsible. The same message cannot do both jobs.<br><br><strong>Payment method background.</strong> Trustly Gaming Consumers showed that competitor users (Plaid/Mazooma) chose Trustly on second attempt more often than first — they understand the category but need a reason to switch. Card/PayPal users are starting from a more distant default and need more explanation.<br><br><strong>Betting engagement level.</strong> Higher-frequency bettors (Trustly's most natural users) weight speed and ease of use most heavily. Less frequent bettors weight security and familiarity more. Messaging that works for one may not land for the other.",
+    s:"Lightbox Perception Benchmark · Finding 3 · Trustly Gaming Consumers · Participant profile + Choosing pattern" },
+
+  // ── PM: A/B TESTING ──────────────────────────────────────
+  { kw:["a/b test","ab test","test","experiment","what to test","test hypothesis","run experiment","test in production","test with users"],
+    a:"The studies identify several high-confidence hypotheses worth testing in a live flow:<br><br><strong>Hypothesis 1:</strong> Adding 'No account or routing number needed' to the payment lineup will reduce credential anxiety and increase first-click selection of Trustly among OLB-unfamiliar users. Evidence base: Payment Line-Up Expectations found this was the top positive surprise after the flow.<br><br><strong>Hypothesis 2:</strong> Explicit Trustly branding at the deposit confirmation screen will increase post-session brand recall above the current 50% baseline. Evidence base: Lightbox Perception Benchmark Finding 7.<br><br><strong>Hypothesis 3:</strong> Positioning Trustly first in the payment lineup will increase first-attempt selection among unfamiliar users. Evidence base: Trustly Gaming Consumers found 1.65 avg attempts in first position vs 3.2 in last position.<br><br><strong>Hypothesis 4:</strong> A one-line explanation of Trustly's role ('Trustly handles this transaction — not the merchant') will reduce trust uncertainty among OLB-unfamiliar users. Evidence base: Trustly Gaming Consumers Slide 13 + Lightbox Perception Benchmark Finding 4.",
+    s:"2022–2025 · across all three studies — four high-confidence hypotheses ready for A/B testing" },
+
+
+];
+
+// ── MATCHING ENGINE ───────────────────────────────────────
+function findAnswer(q) {
+  const ql = q.toLowerCase().replace(/[^a-z0-9 ]/g,' ');
+  const words = ql.split(/\s+/).filter(w => w.length > 2);
+  let best = null, bestScore = 0;
+  KB.forEach(entry => {
+    let score = 0;
+    entry.kw.forEach(kw => {
+      const kwl = kw.toLowerCase();
+      if (ql.includes(kwl)) score += kwl.split(' ').length * 3;
+      kwl.split(' ').forEach(w => { if (words.includes(w)) score += 1; });
+    });
+    if (score > bestScore) { bestScore = score; best = entry; }
+  });
+  return bestScore >= 2 ? best : null;
+}
+
+// ── CHAT ─────────────────────────────────────────────────
+let busy = false;
+
+
+function ask(q) {
+  document.getElementById('input').value = q;
+  sendQ();
+}
+
+function sendQ() {
+  if (busy) return;
+  const inp = document.getElementById('input');
+  const q = inp.value.trim();
+  if (!q) return;
+  inp.value = '';
+  busy = true;
+  document.getElementById('send-btn') && (document.getElementById('send-btn').disabled = true);
+
+  const welcome = document.getElementById('welcome');
+  const chatArea = document.getElementById('chat-area');
+  if (welcome.style.display !== 'none') {
+    welcome.style.display = 'none';
+    chatArea.style.display = 'flex';
+  }
+
+  // Add to recents
+  const recentList = document.getElementById('recent-list');
+  const newRecent = document.createElement('div');
+  newRecent.className = 'recent-item';
+  newRecent.textContent = q.length > 38 ? q.slice(0, 38) + '...' : q;
+  recentList.insertBefore(newRecent, recentList.firstChild);
+
+  const uEl = document.createElement('div');
+  uEl.className = 'msg-user msg-fade';
+  uEl.innerHTML = '<div class="msg-user-bubble">' + esc(q) + '</div>';
+  chatArea.appendChild(uEl);
+  scrollDown();
+
+  const tEl = document.createElement('div');
+  tEl.className = 'typing-row msg-fade';
+  tEl.innerHTML = '<div class="msg-gem-avatar">' + GEM_AVATAR + '</div><div class="typing-dots"><span></span><span></span><span></span></div>';
+  chatArea.appendChild(tEl);
+  scrollDown();
+
+  const match = findAnswer(q);
+  const delay = 900 + Math.random() * 700;
+
+  setTimeout(() => {
+    tEl.remove();
+    const aEl = document.createElement('div');
+    aEl.className = 'msg-assistant msg-fade';
+
+    if (match) {
+      aEl.innerHTML = '<div class="msg-gem-avatar">' + GEM_AVATAR + '</div><div class="msg-body"><div class="msg-text">' + match.a + '</div><div class="source-chip"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>' + esc(match.s) + '</div></div>';
+    } else {
+      aEl.innerHTML = '<div class="msg-gem-avatar">' + GEM_AVATAR + '</div><div class="msg-body"><div class="msg-text">This question is not covered by the studies currently in the repository. It may be worth <strong>commissioning research to fill this gap</strong> — the assistant answers only from validated internal evidence.</div><div class="no-evidence"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>No study found in current repository</div></div>';
+    }
+
+    chatArea.appendChild(aEl);
+    scrollDown();
+    busy = false;
+    document.getElementById('input').focus();
+  }, delay);
+}
+
+function resetChat() {
+  const welcome = document.getElementById('welcome');
+  const chatArea = document.getElementById('chat-area');
+  welcome.style.display = 'flex';
+  chatArea.style.display = 'none';
+  chatArea.innerHTML = '';
+  document.getElementById('input').value = '';
+  busy = false;
+}
+
+function scrollDown() {
+  const msgs = document.getElementById('messages');
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
+function esc(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+</script>
+</body>
+</html>
