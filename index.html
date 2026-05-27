@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Research Assistant — Trustly</title>
+<link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700&family=Google+Sans+Text:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #f0f4f9;
+    --surface: #ffffff;
+    --sidebar: #f8fafb;
+    --border: #e3e8ef;
+    --border-light: #f0f3f8;
+    --text-primary: #1f2937;
+    --text-secondary: #5f6368;
+    --text-muted: #9aa0a6;
+    --blue: #1a73e8;
+    --blue-light: #e8f0fe;
+    --blue-mid: #c5d8f8;
+    --green: #1a7a4a;
+    --green-light: #e6f4ea;
+    --green-border: #a8d5b5;
+    --gem-grad: linear-gradient(135deg, #4285f4 0%, #9b72cb 45%, #d96570 75%, #f5a623 100%);
+    --user-bubble: #e8f0fe;
+    --response-bg: #ffffff;
+    --font: 'Google Sans Text', 'Google Sans', sans-serif;
+    --font-display: 'Google Sans', sans-serif;
+    --radius: 12px;
+    --shadow: 0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.04);
+    --shadow-md: 0 4px 16px rgba(0,0,0,0.08);
+  }
+
+  html, body { height: 100%; font-family: var(--font); background: var(--bg); color: var(--text-primary); }
+
+  /* ── LAYOUT ─────────────────────────────────────────────── */
+  .shell {
+    display: grid;
+    grid-template-columns: 260px 1fr;
+    grid-template-rows: 48px 1fr;
+    height: 100vh;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow-md);
+    overflow: hidden;
+  }
+
+  /* ── TOPBAR ─────────────────────────────────────────────── */
+  .topbar {
+    grid-column: 1 / -1;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    padding: 0 16px;
+    gap: 12px;
+  }
+  .topbar-gem { width: 28px; height: 28px; border-radius: 50%; background: var(--gem-grad); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .topbar-gem svg { width: 16px; height: 16px; }
+  .topbar-title { font-family: var(--font-display); font-size: 16px; font-weight: 500; color: var(--text-primary); }
+  .topbar-sub { font-size: 12px; color: var(--text-muted); margin-left: 4px; }
+  .topbar-badge { margin-left: auto; background: #fff3e0; border: 1px solid #ffcc80; border-radius: 20px; padding: 2px 10px; font-size: 11px; font-weight: 500; color: #e65100; }
+
+  /* ── SIDEBAR ────────────────────────────────────────────── */
+  .sidebar {
+    background: var(--sidebar);
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+  .sidebar-header { padding: 16px; }
+  .sidebar-label { font-size: 11px; font-weight: 500; color: var(--text-muted); letter-spacing: 0.06em; text-transform: uppercase; margin-bottom: 10px; }
+  .sidebar-item { display: flex; align-items: flex-start; gap: 8px; padding: 8px 10px; border-radius: 8px; cursor: pointer; transition: background 0.12s; margin-bottom: 2px; }
+  .sidebar-item:hover { background: var(--blue-light); }
+  .sidebar-item.active { background: var(--blue-light); }
+  .sidebar-item-icon { font-size: 14px; flex-shrink: 0; margin-top: 1px; }
+  .sidebar-item-text { font-size: 12.5px; color: var(--text-secondary); line-height: 1.4; }
+  .sidebar-item.active .sidebar-item-text { color: var(--blue); font-weight: 500; }
+  .sidebar-divider { height: 1px; background: var(--border); margin: 8px 16px; }
+  .sidebar-studies { padding: 0 16px 16px; flex: 1; overflow-y: auto; }
+  .study-chip { display: flex; align-items: center; gap: 6px; padding: 6px 8px; border-radius: 6px; margin-bottom: 3px; cursor: pointer; transition: background 0.12s; }
+  .study-chip:hover { background: var(--border-light); }
+  .study-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+  .study-dot.ready { background: #34a853; }
+  .study-dot.pending { background: #fbbc04; }
+  .study-dot.todo { background: #dadce0; }
+  .study-name { font-size: 11.5px; color: var(--text-secondary); line-height: 1.3; }
+  .sidebar-footer { padding: 12px 16px; border-top: 1px solid var(--border); }
+  .sidebar-footer-text { font-size: 10.5px; color: var(--text-muted); line-height: 1.5; }
+  .sidebar-footer-text strong { color: var(--text-secondary); }
+
+  /* ── MAIN CHAT ──────────────────────────────────────────── */
+  .main {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  .messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 24px 48px;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    scroll-behavior: smooth;
+  }
+  .messages::-webkit-scrollbar { width: 6px; }
+  .messages::-webkit-scrollbar-track { background: transparent; }
+  .messages::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+  /* welcome state */
+  .welcome { display: flex; flex-direction: column; align-items: center; justify-content: center; flex: 1; text-align: center; padding: 40px 24px; gap: 16px; }
+  .welcome-gem { width: 56px; height: 56px; border-radius: 50%; background: var(--gem-grad); display: flex; align-items: center; justify-content: center; }
+  .welcome-gem svg { width: 28px; height: 28px; }
+  .welcome-title { font-family: var(--font-display); font-size: 22px; font-weight: 500; color: var(--text-primary); }
+  .welcome-sub { font-size: 14px; color: var(--text-secondary); max-width: 420px; line-height: 1.6; }
+  .suggestions { display: flex; flex-direction: column; gap: 8px; width: 100%; max-width: 520px; margin-top: 8px; }
+  .sug-btn { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 10px 16px; font-size: 13px; color: var(--text-secondary); cursor: pointer; text-align: left; transition: all 0.15s; font-family: var(--font); line-height: 1.4; }
+  .sug-btn:hover { background: var(--blue-light); border-color: var(--blue-mid); color: var(--blue); }
+
+  /* user message */
+  .msg-user { display: flex; justify-content: flex-end; }
+  .msg-user-bubble { background: var(--user-bubble); color: var(--text-primary); padding: 10px 16px; border-radius: 18px 18px 4px 18px; font-size: 14px; line-height: 1.5; max-width: 72%; }
+
+  /* assistant message */
+  .msg-assistant { display: flex; gap: 12px; align-items: flex-start; }
+  .msg-gem-icon { width: 32px; height: 32px; border-radius: 50%; background: var(--gem-grad); flex-shrink: 0; display: flex; align-items: center; justify-content: center; margin-top: 2px; }
+  .msg-gem-icon svg { width: 16px; height: 16px; }
+  .msg-body { flex: 1; max-width: 80%; }
+  .msg-text { font-size: 14px; line-height: 1.7; color: var(--text-primary); margin-bottom: 10px; }
+  .msg-text strong { font-weight: 600; }
+  .msg-text em { font-style: italic; color: var(--text-secondary); }
+
+  /* source chip */
+  .source-chip { display: inline-flex; align-items: center; gap: 6px; background: var(--green-light); border: 1px solid var(--green-border); border-radius: 20px; padding: 4px 12px; font-size: 11.5px; color: var(--green); font-weight: 500; }
+  .source-chip svg { width: 12px; height: 12px; flex-shrink: 0; }
+  .no-evidence { display: inline-flex; align-items: center; gap: 6px; background: #fff8e1; border: 1px solid #ffe082; border-radius: 20px; padding: 4px 12px; font-size: 11.5px; color: #e65100; font-weight: 500; }
+
+  /* typing indicator */
+  .typing-wrap { display: flex; gap: 12px; align-items: flex-start; }
+  .typing-dots { display: flex; align-items: center; gap: 4px; padding: 12px 16px; background: var(--border-light); border-radius: 18px; }
+  .typing-dots span { width: 6px; height: 6px; border-radius: 50%; background: var(--text-muted); animation: blink 1.2s infinite; }
+  .typing-dots span:nth-child(2) { animation-delay: .2s; }
+  .typing-dots span:nth-child(3) { animation-delay: .4s; }
+  @keyframes blink { 0%,80%,100%{opacity:.3} 40%{opacity:1} }
+
+  /* message animation */
+  .msg-fade { opacity: 0; transform: translateY(8px); animation: fadeUp 0.3s ease forwards; }
+  @keyframes fadeUp { to { opacity:1; transform:none; } }
+
+  /* ── INPUT ──────────────────────────────────────────────── */
+  .input-area { padding: 16px 48px 20px; border-top: 1px solid var(--border); background: var(--surface); }
+  .input-wrap { display: flex; align-items: center; gap: 10px; background: var(--bg); border: 1px solid var(--border); border-radius: 26px; padding: 8px 12px 8px 20px; transition: border-color 0.15s, box-shadow 0.15s; }
+  .input-wrap:focus-within { border-color: #aecbfa; box-shadow: 0 0 0 3px rgba(66,133,244,0.1); }
+  .input-wrap input { flex: 1; border: none; background: transparent; font-family: var(--font); font-size: 14px; color: var(--text-primary); outline: none; }
+  .input-wrap input::placeholder { color: var(--text-muted); }
+  .send-btn { width: 36px; height: 36px; border-radius: 50%; background: var(--blue); border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: background 0.15s; }
+  .send-btn:hover { background: #1557b0; }
+  .send-btn:disabled { background: var(--border); cursor: default; }
+  .send-btn svg { width: 16px; height: 16px; fill: white; }
+  .input-note { font-size: 11px; color: var(--text-muted); text-align: center; margin-top: 8px; }
+  .input-note a { color: var(--blue); text-decoration: none; }
+  .input-note a:hover { text-decoration: underline; }
+</style>
+</head>
+<body>
+
+<div class="shell">
+
+  <!-- TOPBAR -->
+  <div class="topbar">
+    <div class="topbar-gem">
+      <svg viewBox="0 0 24 24" fill="none">
+        <path d="M12 2C12 2 7.5 8 7.5 12C7.5 16 12 22 12 22C12 22 16.5 16 16.5 12C16.5 8 12 2 12 2Z" fill="white" opacity=".9"/>
+        <path d="M2 12C2 12 8 7.5 12 7.5C16 7.5 22 12 22 12C22 12 16 16.5 12 16.5C8 16.5 2 12 2 12Z" fill="white" opacity=".55"/>
+      </svg>
+    </div>
+    <span class="topbar-title">Research Assistant</span>
+    <span class="topbar-sub">· Trustly · powered by Gemini</span>
+    <div class="topbar-badge">PROTOTYPE</div>
+  </div>
+
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="sidebar-header">
+      <div class="sidebar-label">Recent</div>
+      <div class="sidebar-item active">
+        <span class="sidebar-item-icon">💬</span>
+        <span class="sidebar-item-text">Lightbox research questions</span>
+      </div>
+      <div class="sidebar-item">
+        <span class="sidebar-item-icon">💬</span>
+        <span class="sidebar-item-text">OLB user behaviour</span>
+      </div>
+      <div class="sidebar-item">
+        <span class="sidebar-item-icon">💬</span>
+        <span class="sidebar-item-text">Competitor trust signals</span>
+      </div>
+    </div>
+
+    <div class="sidebar-divider"></div>
+
+    <div class="sidebar-studies">
+      <div class="sidebar-label">Knowledge base</div>
+      <div class="study-chip">
+        <div class="study-dot ready"></div>
+        <span class="study-name">Lightbox Perception Benchmark</span>
+      </div>
+      <div class="study-chip">
+        <div class="study-dot ready"></div>
+        <span class="study-name">Payment Line Up Expectations</span>
+      </div>
+      <div class="study-chip">
+        <div class="study-dot pending"></div>
+        <span class="study-name">Trustly Gaming Consumers</span>
+      </div>
+      <div class="study-chip">
+        <div class="study-dot todo"></div>
+        <span class="study-name">Consumer Payment Preference Study</span>
+      </div>
+      <div class="study-chip">
+        <div class="study-dot todo"></div>
+        <span class="study-name">OLB Detractors Users Research</span>
+      </div>
+      <div class="study-chip">
+        <div class="study-dot todo"></div>
+        <span class="study-name">OLB High-Value Users Research</span>
+      </div>
+      <div style="margin-top:10px; font-size:10.5px; color:var(--text-muted); line-height:1.5;">
+        <span style="color:#34a853">●</span> ready &nbsp;
+        <span style="color:#fbbc04">●</span> in review &nbsp;
+        <span style="color:#dadce0">●</span> pending
+      </div>
+    </div>
+
+    <div class="sidebar-footer">
+      <div class="sidebar-footer-text">
+        <strong>Answers come only from verified internal research.</strong> When evidence is missing, the assistant says so.
+      </div>
+    </div>
+  </div>
+
+  <!-- MAIN -->
+  <div class="main">
+    <div class="messages" id="messages">
+      <div class="welcome" id="welcome">
+        <div class="welcome-gem">
+          <svg viewBox="0 0 24 24" fill="none">
+            <path d="M12 2C12 2 7.5 8 7.5 12C7.5 16 12 22 12 22C12 22 16.5 16 16.5 12C16.5 8 12 2 12 2Z" fill="white" opacity=".9"/>
+            <path d="M2 12C2 12 8 7.5 12 7.5C16 7.5 22 12 22 12C22 12 16 16.5 12 16.5C8 16.5 2 12 2 12Z" fill="white" opacity=".55"/>
+          </svg>
+        </div>
+        <div class="welcome-title">What do you want to know?</div>
+        <div class="welcome-sub">Ask anything about Trustly's research. I answer only from validated internal studies and always tell you where the answer came from.</div>
+        <div class="suggestions" id="suggestions">
+          <button class="sug-btn" onclick="ask('Is Trustly Standard performing well compared to its competitors?')">Is Trustly Standard performing well compared to its competitors?</button>
+          <button class="sug-btn" onclick="ask('Why do OLB-unfamiliar users hesitate to complete the flow?')">Why do OLB-unfamiliar users hesitate to complete the flow?</button>
+          <button class="sug-btn" onclick="ask('Why does Plaid have high brand recall but low trust scores?')">Why does Plaid have high brand recall but low trust scores?</button>
+          <button class="sug-btn" onclick="ask('Does friction in Trustly Pass help or hurt trust?')">Does friction in Trustly Pass help or hurt trust?</button>
+          <button class="sug-btn" onclick="ask('Which competitor should Trustly watch most closely?')">Which competitor should Trustly watch most closely?</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="input-area">
+      <div class="input-wrap">
+        <input type="text" id="input" placeholder="Ask about Trustly research..." autocomplete="off" onkeydown="if(event.key==='Enter')sendQ()">
+        <button class="send-btn" id="send-btn" onclick="sendQ()">
+          <svg viewBox="0 0 24 24"><path d="M2 21l21-9L2 3v7l15 2-15 2v7z"/></svg>
+        </button>
+      </div>
+      <div class="input-note">
+        Answers come only from Trustly's internal research · currently covering <strong>Lightbox Perception Benchmark (UXR-2025-LBPBM)</strong> ·
+        <a href="https://docs.google.com/document/d/1IBfjMt0W3riw7Ufe_IXNNxUA_Y84Wkb7/edit" target="_blank">Full Q&A document →</a>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// ── KNOWLEDGE BASE ────────────────────────────────────────────
+// Each entry: keywords[], answer (html string), source string
+const KB = [
+
+  // ── OVERALL PERFORMANCE ──────────────────────────────────
+  { kw:["trustly standard","performing","well","competitor","compare","comparison","benchmark","how is","how does"],
+    a:`<strong>It depends on which dimension you look at.</strong> On usability and perceived speed, Trustly Standard is competitive — it was consistently described as the fastest-feeling flow in qualitative sessions, and ease ratings were high across all five products tested.<br><br>On brand recall and trust ownership, the picture is weaker: only <strong>50% of participants recalled Trustly Standard</strong> after their session, and the trust they expressed was largely attributed to the bank rather than to Trustly as a provider. The study does not show Trustly Standard failing — but it does show a product that is operationally solid without leaving a strategic trace.`,
+    s:"UXR-2025-LBPBM · Section 8 — Canonical Q&A + Finding 2 + Finding 7" },
+
+  // ── MOST IMPORTANT FINDING ───────────────────────────────
+  { kw:["most important","single","key finding","main finding","biggest finding","number one","#1","top finding","what did","study find","what was found"],
+    a:`The most important finding is that <strong>OLB familiarity explained more variation in perception than the product tested.</strong><br><br>Familiar users rated every flow more positively — especially on trust and security — while unfamiliar users completed the same flows but expressed substantially more uncertainty about whether the experience was safe and legitimate.<br><br>This means the main barrier to adoption is not a design flaw that can be fixed with a better interface. It is a <strong>context gap</strong> the interface needs to actively close. That reframes the product problem from usability improvement to trust communication.`,
+    s:"UXR-2025-LBPBM · Section 8 — Canonical Q&A + Finding 3" },
+
+  // ── OLB UNFAMILIAR USERS ─────────────────────────────────
+  { kw:["unfamiliar","olb unfamiliar","new user","first time","never used","hesitat","trust gap","uncertain","abandon","drop","barrier"],
+    a:`OLB-unfamiliar users completed the flow but expressed substantially lower confidence on trust and security items. Their issue wasn't confusion about the steps — <strong>they lacked the context needed to decide whether the experience was safe enough to continue.</strong><br><br>Some finished the task but said they'd want to research the provider before using it with real banking information. Others expressed discomfort they resolved only because the simulation felt low-risk.<br><br>In a real transaction, that residual uncertainty becomes the driver of second-session hesitation and long-term avoidance.`,
+    s:"UXR-2025-LBPBM · Finding 3 + Section 8" },
+
+  // ── PLAID RECALL VS TRUST ────────────────────────────────
+  { kw:["plaid","recall","brand recall","remember","recognition","high recall","low trust","trust score","data","permission","scope"],
+    a:`Plaid was recalled by <strong>95% of participants</strong> — the highest of all five flows — but also produced more explicit concern about data access than any other product, which depressed its trust and security ratings.<br><br>Plaid's data permission screens made the brand visible and the interaction memorable. But that same visibility drew attention to the breadth of data being requested, prompting participants to question whether the access was necessary or appropriate.<br><br><strong>Recall and trust are separate assets that can move in opposite directions.</strong> Being noticed is not the same as being trusted. The lesson for Trustly: build brand visibility without reproducing Plaid's data-exposure problem.`,
+    s:"UXR-2025-LBPBM · Finding 5 + Section 8" },
+
+  // ── FRICTION / TRUSTLY PASS ──────────────────────────────
+  { kw:["friction","trustly pass","pass","verification","mfa","phone","email","step","extra step","security step","reassurance","help or hurt","obstacle"],
+    a:`It depends on familiarity. <strong>OLB-familiar users interpreted the phone and email verification steps as protection signals</strong> — they understood what those steps prevented and rated security higher as a result.<br><br>OLB-unfamiliar users encountered the same steps without that context, leading to neutral or uncertain security judgments. Some completed the steps without understanding why they were there.<br><br><strong>Friction works when the user can read its purpose.</strong> Without explanation, it is experienced only as delay. Each added step needs a visible reason — not a generic security label, but a specific explanation of what the step prevents.`,
+    s:"UXR-2025-LBPBM · Finding 6 + Section 8" },
+
+  // ── SPEED ───────────────────────────────────────────────
+  { kw:["speed","fast","fastest","quick","efficient","instant","time","how long","slow"],
+    a:`Trustly Standard was <strong>consistently perceived as the fastest-feeling flow</strong>, particularly among familiar users. Participants described it as completing in a single step and going through immediately.<br><br>The advantage is real but narrow — quantitative speed ratings clustered between 4.75 and 4.8 out of 5 across all flows. One important caveat: the first deposit is less efficient because the bank connection step adds setup time. <strong>The speed advantage is strongest on repeat use.</strong>`,
+    s:"UXR-2025-LBPBM · Finding 2" },
+
+  // ── BRAND RECALL ────────────────────────────────────────
+  { kw:["brand recall","recall","remember","recognition","brand memory","brand awareness","logo","name","recogni"],
+    a:`Brand recall varied significantly across the five flows:<br><br>
+    <strong>Plaid 95%</strong> · Trustly Pass 75% · Stripe 65% · <strong>Trustly Standard 50%</strong> · Link 40%<br><br>
+    Trustly Standard's smoothness reduced the number of moments where the brand registered with users. A smooth experience that leaves no brand trace is commercially limited — users who cannot connect a positive deposit to the Trustly name are not building loyalty to Trustly. They are building loyalty to the general act of bank-payment, which is transferable to any competitor.`,
+    s:"UXR-2025-LBPBM · Finding 7 + Section 7" },
+
+  // ── BORROWED TRUST ──────────────────────────────────────
+  { kw:["borrowed trust","bank trust","chase","trust brand","own trust","build trust","trustly brand","brand trust","relies on","depend on bank"],
+    a:`Participants who trusted the Trustly Standard flow most often <strong>attributed that trust to the bank</strong> — to Chase's login screen, the bank's logo, and the direct bank-to-account transfer logic. Trustly's own name appeared much less frequently as an active trust signal.<br><br>This borrowed trust is commercially fragile: a user who trusts Chase will trust any provider that connects through Chase. Trustly can be replaced without meaningful resistance.<br><br>The path forward is to make the Trustly brand visible at key moments — flow entry, bank-connection confirmation, deposit success — while explicitly positioning Trustly as the secure mechanism enabling the transaction.`,
+    s:"UXR-2025-LBPBM · Finding 4 + Section 8" },
+
+  // ── COMPETITOR TO WATCH ─────────────────────────────────
+  { kw:["competitor","watch","attention","stripe","link","pay attention","threat","benchmark against","focus on","rival"],
+    a:`<strong>Stripe is the most useful comparison point for Trustly to study further.</strong> It appeared directionally strongest on trust and security items, and participants in the Stripe condition cited brand credibility and cross-referencing with known institutions as the basis for their trust.<br><br>Plaid is the most useful contrast case — not to emulate, but to learn from in reverse. It shows what happens when brand visibility comes at the cost of data comfort.<br><br>The study does not prove Stripe is better designed — it generates a hypothesis worth investigating through qualitative follow-up or targeted A/B testing.`,
+    s:"UXR-2025-LBPBM · Section 8 — Canonical Q&A" },
+
+  // ── WHAT TO TEST NEXT ───────────────────────────────────
+  { kw:["test next","next step","what to do","intervention","improve","recommendation","design change","a/b","roadmap","action","next research"],
+    a:`The most productive next step is <strong>moving from measuring perception to testing specific interventions.</strong><br><br>The study identified where the trust gap is concentrated — in the moments before and during the bank-connection step — but did not test whether specific design changes close it. Interventions worth testing:<br><br>
+    · A brief in-flow explanation of what Trustly's role is and what data it accesses<br>
+    · Visible Trustly branding at the confirmation screen<br>
+    · A restrained data-scope statement that explicitly limits what is collected<br>
+    · Bank endorsement cues positioned before the credential step<br><br>
+    These should be tested in a live flow — outcome variable should be completion and return rate, not self-reported satisfaction.`,
+    s:"UXR-2025-LBPBM · Section 8 — Canonical Q&A" },
+
+  // ── STANDARD VS PASS ────────────────────────────────────
+  { kw:["standard vs pass","trustly pass vs","same product","two versions","difference between","standard and pass","which one","choose between"],
+    a:`The data supports <strong>treating them as different tools serving different user goals</strong> — not as two versions of the same product.<br><br>
+    <strong>Trustly Standard</strong> is well positioned for familiar users making a fast, time-sensitive deposit. It minimises interruption and aligns with the user's primary objective of getting back to betting.<br><br>
+    <strong>Trustly Pass</strong> is better positioned for first-time account saving, higher-stakes connections, and situations where brand memory and security reassurance matter more than raw speed.<br><br>
+    Choosing between them should depend on the user's situation — not on general perception scores, where the two products appear almost identical.`,
+    s:"UXR-2025-LBPBM · Section 8 — Canonical Q&A + Finding 6" },
+
+  // ── USABILITY ───────────────────────────────────────────
+  { kw:["usability","easy to use","easy","intuitive","understand","simple","navigation","ux","user experience","clear","confus"],
+    a:`All five flows were rated as easy, intuitive, and understandable — reflecting shared <strong>category-level familiarity</strong> with the bank-linking task rather than any single product's design superiority.<br><br>Usability scores were near the positive ceiling of the scale (4.75–4.8 out of 5 across all products), which limited the study's ability to detect fine-grained differences.<br><br><strong>Trustly should not position itself primarily on ease of use.</strong> The competitive case needs to be built on dimensions that actually differentiate: speed, trust, data restraint, and brand recall.`,
+    s:"UXR-2025-LBPBM · Finding 1 + Section 7" },
+
+  // ── SAMPLE / PARTICIPANTS ───────────────────────────────
+  { kw:["participant","sample","who","demographic","profile","age","income","how many","n=","100","bettor","audience","recruit"],
+    a:`The study included <strong>100 participants</strong> — 5 groups of 20, each assigned to one payment flow. Within each group, 10 participants were OLB-familiar and 10 were OLB-unfamiliar.<br><br>The demographic centre of gravity: <strong>30s–40s, employed full-time, high income (above $100k), highly educated.</strong> Most were active sports bettors familiar with sportsbook funding.<br><br>Important caveat: this high-income, digitally fluent profile likely produces more tolerant, confident responses than a less experienced group would. Friction and trust concerns found in this study may be conservative estimates.`,
+    s:"UXR-2025-LBPBM · Section 4 — Participant Profile" },
+
+  // ── METHODOLOGY ─────────────────────────────────────────
+  { kw:["method","methodology","how was","study design","research design","prototype","moderated","unmoderated","think aloud","likert","between subject","quantitative","qualitative","mixed"],
+    a:`The study used a <strong>semi-experimental, between-subject design</strong> — each participant saw only one payment flow, which prevents order effects and captures genuine first impressions.<br><br>
+    · Format: unmoderated think-aloud sessions with Likert scale items<br>
+    · Stimulus: high-fidelity prototypes simulating a $100 deposit from Chase<br>
+    · Platform: Maze<br>
+    · N: 100 participants across 5 product conditions<br><br>
+    The between-subject design means comparisons are made at the group level, not individual preference rankings. With groups of 20, statistical power is limited — product-level differences should be treated as directional, not confirmed.`,
+    s:"UXR-2025-LBPBM · Section 3 — Methodology" },
+
+  // ── LIMITATIONS ─────────────────────────────────────────
+  { kw:["limitation","caveat","cannot tell","what the study","can't","reliable","not reliable","confidence","uncertainty","caution","weakness"],
+    a:`Three caveats are critical before using this study for design decisions:<br><br>
+    <strong>1. Product differences are not statistically significant</strong> — any ranking of the five flows is directional, not confirmed.<br><br>
+    <strong>2. Ceiling effects</strong> — most items were rated positively, which limits the study's ability to distinguish products that are genuinely similar from those whose differences are too subtle for this measurement to detect.<br><br>
+    <strong>3. Prototype context</strong> — real banking information was not at stake. Trust responses in a prototype study are best-case estimates; actual barriers in a live context are likely at least as strong.<br><br>
+    The study is most reliable as evidence of the familiarity-trust gap. It is least reliable as a basis for definitive competitive rankings.`,
+    s:"UXR-2025-LBPBM · Section 8 — Canonical Q&A + Section 3" },
+
+  // ── ICR / CONVERSION ────────────────────────────────────
+  { kw:["icr","conversion","abandon","completion rate","drop off","complete","finish","funnel","convert"],
+    a:`The study <strong>cannot tell us which specific design change would most improve ICR</strong>, because it did not test design variations against a behavioural outcome metric.<br><br>Participants completed the task in a prototype environment — the perceived risk was lower than in a real transaction. Whether behavioural completion would hold in a live context, with real money and a real bank account, is unknown.<br><br>The study identifies where hesitation is concentrated and what contextual signals might reduce it. Measuring actual abandonment and the specific moment where unfamiliar users drop off requires a live behavioural study.`,
+    s:"UXR-2025-LBPBM · Section 8 — Canonical Q&A" },
+
+  // ── DATA PRIVACY / SECURITY ─────────────────────────────
+  { kw:["data","privacy","security","secure","safe","protect","access","permission","sensitive","banking information","credential","account"],
+    a:`Security perception was the primary axis of variation in the study — and it was driven more by OLB familiarity than by the product tested.<br><br>Unfamiliar users consistently used hedged language: "I'd have to be neutral," "I don't know if it's secure." This contrasts with confident, unqualified positive responses from familiar users on the same dimensions.<br><br>Plaid triggered the most explicit data-access concern. Trustly Standard avoided this — but its lower data salience is an <strong>asset to be actively protected and communicated</strong>, not just passively maintained.`,
+    s:"UXR-2025-LBPBM · Finding 3 + Finding 5 + Section 7" },
+
+  // ── FAMILIARITY GAP ─────────────────────────────────────
+  { kw:["familiarity","familiar","unfamiliar","experience","prior","olb familiarity","familiarity gap","olb experience","background","knowledge"],
+    a:`<strong>OLB familiarity is the strongest driver of perception in the dataset</strong> — outweighing product differences across most dimensions.<br><br>Familiar users rated every flow more positively, especially on trust and security. Unfamiliar users completed the same flows but with substantially more uncertainty.<br><br>This gap matters even though both groups completed the task. Task completion in a prototype study does not equal trust or repeat willingness to use. The product's growth depends on converting unfamiliar users into OLB adopters — and this study shows those users are not currently being given what they need to make that decision confidently.`,
+    s:"UXR-2025-LBPBM · Finding 3 + Section 7 + Section 8" },
+
+  // ── INTENT TO USE ───────────────────────────────────────
+  { kw:["intent","intention","would use","will use","use again","willingness","adopt","adoption","reuse","return"],
+    a:`Intention to use ratings were generally positive across all flows — consistent with broad category acceptance. However, <strong>intention ratings collected in a prototype study do not predict actual behavioural adoption.</strong><br><br>They should be read as a ceiling estimate of willingness, not as a forecast of conversion. Unfamiliar users who expressed positive intention often qualified it: "I'd agree, but I'd want to know more first."`,
+    s:"UXR-2025-LBPBM · Section 7" },
+];
+
+// ── MATCHING ENGINE ───────────────────────────────────────────
+function findAnswer(q) {
+  const ql = q.toLowerCase().replace(/[^a-z0-9 ]/g,' ');
+  const words = ql.split(/\s+/).filter(w => w.length > 2);
+
+  let best = null, bestScore = 0;
+  KB.forEach(entry => {
+    let score = 0;
+    entry.kw.forEach(kw => {
+      const kwl = kw.toLowerCase();
+      // exact phrase match
+      if (ql.includes(kwl)) score += kwl.split(' ').length * 3;
+      // word overlap
+      kwl.split(' ').forEach(w => { if (words.includes(w)) score += 1; });
+    });
+    if (score > bestScore) { bestScore = score; best = entry; }
+  });
+  return bestScore >= 2 ? best : null;
+}
+
+// ── CHAT ENGINE ───────────────────────────────────────────────
+let busy = false;
+
+function ask(q) {
+  document.getElementById('input').value = q;
+  sendQ();
+}
+
+function sendQ() {
+  if (busy) return;
+  const inp = document.getElementById('input');
+  const q = inp.value.trim();
+  if (!q) return;
+  inp.value = '';
+  busy = true;
+  document.getElementById('send-btn').disabled = true;
+
+  // hide welcome
+  const welcome = document.getElementById('welcome');
+  if (welcome) welcome.remove();
+
+  const msgs = document.getElementById('messages');
+
+  // user bubble
+  const uEl = document.createElement('div');
+  uEl.className = 'msg-user msg-fade';
+  uEl.innerHTML = `<div class="msg-user-bubble">${escHtml(q)}</div>`;
+  msgs.appendChild(uEl);
+  msgs.scrollTop = msgs.scrollHeight;
+
+  // typing
+  const tEl = document.createElement('div');
+  tEl.className = 'typing-wrap msg-fade';
+  tEl.innerHTML = `
+    <div class="msg-gem-icon"><svg viewBox="0 0 24 24" fill="none"><path d="M12 2C12 2 7.5 8 7.5 12C7.5 16 12 22 12 22C12 22 16.5 16 16.5 12C16.5 8 12 2 12 2Z" fill="white" opacity=".9"/><path d="M2 12C2 12 8 7.5 12 7.5C16 7.5 22 12 22 12C22 12 16 16.5 12 16.5C8 16.5 2 12 2 12Z" fill="white" opacity=".55"/></svg></div>
+    <div class="typing-dots"><span></span><span></span><span></span></div>`;
+  msgs.appendChild(tEl);
+  msgs.scrollTop = msgs.scrollHeight;
+
+  const delay = 900 + Math.random() * 800;
+  setTimeout(() => {
+    tEl.remove();
+    const match = findAnswer(q);
+
+    const aEl = document.createElement('div');
+    aEl.className = 'msg-assistant msg-fade';
+
+    if (match) {
+      aEl.innerHTML = `
+        <div class="msg-gem-icon"><svg viewBox="0 0 24 24" fill="none"><path d="M12 2C12 2 7.5 8 7.5 12C7.5 16 12 22 12 22C12 22 16.5 16 16.5 12C16.5 8 12 2 12 2Z" fill="white" opacity=".9"/><path d="M2 12C2 12 8 7.5 12 7.5C16 7.5 22 12 22 12C22 12 16 16.5 12 16.5C8 16.5 2 12 2 12Z" fill="white" opacity=".55"/></svg></div>
+        <div class="msg-body">
+          <div class="msg-text">${match.a}</div>
+          <div class="source-chip">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+            ${escHtml(match.s)}
+          </div>
+        </div>`;
+    } else {
+      aEl.innerHTML = `
+        <div class="msg-gem-icon"><svg viewBox="0 0 24 24" fill="none"><path d="M12 2C12 2 7.5 8 7.5 12C7.5 16 12 22 12 22C12 22 16.5 16 16.5 12C16.5 8 12 2 12 2Z" fill="white" opacity=".9"/><path d="M2 12C2 12 8 7.5 12 7.5C16 7.5 22 12 22 12C22 12 16 16.5 12 16.5C8 16.5 2 12 2 12Z" fill="white" opacity=".55"/></svg></div>
+        <div class="msg-body">
+          <div class="msg-text">This question isn't covered by the studies currently in the repository. It may be worth <strong>commissioning research to fill this gap</strong> — the assistant can only answer from validated internal evidence.</div>
+          <div class="no-evidence">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="12" height="12"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            No study found in current repository
+          </div>
+        </div>`;
+    }
+
+    msgs.appendChild(aEl);
+    msgs.scrollTop = msgs.scrollHeight;
+    busy = false;
+    document.getElementById('send-btn').disabled = false;
+    document.getElementById('input').focus();
+  }, delay);
+}
+
+function escHtml(s) {
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+</script>
+</body>
+</html>
